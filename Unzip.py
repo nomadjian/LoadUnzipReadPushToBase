@@ -8,6 +8,12 @@ ARCHIVES_PATH = os.getcwd()+'/archives'
 DECOMPRESSED_PATH = os.getcwd()+'/unzip'
 
 
+def clean_up_dir(path):
+    for way in os.listdir(path):
+        print(f"Удаляем файл {path} в директории {path}")
+        os.remove(f"{path}/{way}")
+
+
 def get_and_unzip(archive_path=ARCHIVES_PATH, unzip_path=DECOMPRESSED_PATH):
     """Функция принимает в себя путь к архивам и путь, куда складываем распакованное. При помощи listdir получаем список
       архивов в папке и поочередно распаковываем и выгружаем в папку unzip_path
@@ -18,8 +24,6 @@ def get_and_unzip(archive_path=ARCHIVES_PATH, unzip_path=DECOMPRESSED_PATH):
             with open(f"{unzip_path}/{way.rsplit('.',2)[0]}", 'wb') as decompr_file:
                 print(f"Декомпрессировали файл:{archive_path+way}")  # cугубо отладочный принт
                 shutil.copyfileobj(compr_file, decompr_file)
-                os.remove(f"{archive_path}/{way}")  # этим чистим за собой, удаляя архивы уже разархивированные
-        #os.remove(f"{archive_path}/{way}")
 
 
 def parse_data_from_files():
