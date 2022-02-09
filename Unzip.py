@@ -2,7 +2,7 @@ import gzip
 import os
 import shutil
 import re
-
+import uuid
 
 ARCHIVES_PATH = os.getcwd()+'/archives'
 DECOMPRESSED_PATH = os.getcwd()+'/unzip'
@@ -52,11 +52,12 @@ def parse_data_from_files():
                           "<STATE>(.*?)"
                           "<ZIP>(.*?)<")
     output = []
-    for file in os.listdir(DECOMPRESSED_PATH):
+    for file_way in os.listdir(DECOMPRESSED_PATH):
 
-        with open(f"{DECOMPRESSED_PATH}\\{file}") as file:
-            print(f"Читаем файл ->{file}")
+        with open(f"{DECOMPRESSED_PATH}\\{file_way}") as file:
+            print(f"Читаем файл ->{file_way}")
             search_text = file.read().replace('\n', '')  # чтобы сработала регулярка
+            search_text = search_text.replace('\x00', '')  # удаляем NUL значения для нормальной работы с базой
             company_data = re.findall(text, search_text)
 
             for data in company_data:
@@ -64,19 +65,20 @@ def parse_data_from_files():
                 business = re.findall(business_reg, data)
                 mail = re.findall(mail_reg, data)
 
-                temp_data = []
+                temp_data = [str(uuid.uuid1())]
                 if company:
                     temp_data = temp_data + list(company[0])
                 else:
-                    temp_data = temp_data + ['' for x in range(3)]
+                    temp_data = temp_data + ['none' for x in range(3)]
                 if business:
                     temp_data = temp_data + list(business[0])
                 else:
-                    temp_data = temp_data + ['' for x in range(5)]
+                    temp_data = temp_data + ['none' for x in range(5)]
                 if mail:
                     temp_data = temp_data + list(mail[0])
                 else:
-                    temp_data = temp_data + ['' for x in range(4)]
+                    temp_data = temp_data + ['none' for x in range(4)]
+                temp_data.append(file_way.split('.')[0])
                 output.append(temp_data)
     print("Файлы дочитали")
     return output
